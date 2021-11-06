@@ -1,2 +1,12 @@
+OLED_ENABLE = no
+RGBLIGHT_ENABLE = no
+RGB_MATRIX_ENABLE = no
+RGB_MATRIX_SUPPORTED = no
+
+ENCODER_ENABLE = yes
+
 CUSTOM_MATRIX = yes
+
+SRC += swapper.c
+SRC += oneshot.c
 SRC += matrix.c
