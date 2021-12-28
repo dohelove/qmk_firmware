@@ -3,10 +3,15 @@ RGBLIGHT_ENABLE = no
 RGB_MATRIX_ENABLE = no
 RGB_MATRIX_SUPPORTED = no
 
+DEBOUNCE_TYPE = sym_eager_pr
+
 ENCODER_ENABLE = yes
 
 CUSTOM_MATRIX = yes
+COMBO_ENABLE = yes
 
 SRC += swapper.c
 SRC += oneshot.c
 SRC += matrix.c
+
+CONSOLE_ENABLE = no

@@ -55,7 +55,8 @@ void slave_rpc_exec_callback(uint8_t initiator2target_buffer_size, const void *i
 // Helpers
 
 static bool transaction_handler_master(matrix_row_t master_matrix[], matrix_row_t slave_matrix[], const char *prefix, bool (*handler)(matrix_row_t master_matrix[], matrix_row_t slave_matrix[])) {
-    int num_retries = is_transport_connected() ? 10 : 1;
+    /* int num_retries = is_transport_connected() ? 3 : 1; */
+    int num_retries = 3;
     for (int iter = 1; iter <= num_retries; ++iter) {
         if (iter > 1) {
             for (int i = 0; i < iter * iter; ++i) {

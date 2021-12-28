@@ -17,14 +17,14 @@
 #pragma once
 
 #undef DEBOUNCE
-#define DEBOUNCE 0
+#define DEBOUNCE 30
 
 // Lets you roll mod-tap keys
 #define IGNORE_MOD_TAP_INTERRUPT
 
 #undef COMBO_TERM
 #undef COMBO_LEN
-#define COMBO_TERM 35
+#define COMBO_TERM 40
 #define COMBO_MUST_TAP_PER_COMBO
 #define COMBO_TERM_PER_COMBO
 // All combos are specified from the base layer, saves space
@@ -34,7 +34,15 @@
 #define ENCODER_RESOLUTION 2
 
 // Using experimental serial communication speed
-#define SELECT_SOFT_SERIAL_SPEED 0
+#define SELECT_SOFT_SERIAL_SPEED 1
 
 // Assume always connected both split keyboard side.
 #define SPLIT_MAX_CONNECTION_ERRORS 0
+
+#define USB_POLLING_INTERVAL_MS 1
+#define QMK_KEYS_PER_SCAN 4
+
+#define SERIAL_USE_MULTI_TRANSACTION
+#define CRC8_USE_TABLE
+
+#define DEBUG_MATRIX_SCAN_RATE

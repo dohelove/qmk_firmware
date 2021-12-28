@@ -63,6 +63,7 @@ __attribute__((weak)) bool encoder_update_user(uint8_t index, bool clockwise) { 
 
 __attribute__((weak)) bool encoder_update_kb(uint8_t index, bool clockwise) { return encoder_update_user(index, clockwise); }
 
+
 void encoder_init(void) {
 #if defined(SPLIT_KEYBOARD) && defined(ENCODERS_PAD_A_RIGHT) && defined(ENCODERS_PAD_B_RIGHT)
     if (!isLeftHand) {
@@ -94,8 +95,15 @@ void encoder_init(void) {
 #endif
 }
 
+
+static int8_t encoder_pulse = 0;
+static int8_t mask          = 0;
+static int8_t pulse_abs     = 0;
+static int8_t delta         = 0;
+static bool   changed       = false;
+static bool   rotation_dir  = false;
+
 static bool encoder_update(uint8_t index, uint8_t state) {
-    bool    changed = false;
     uint8_t i       = index;
 
 #ifdef ENCODER_RESOLUTIONS
@@ -107,18 +115,23 @@ static bool encoder_update(uint8_t index, uint8_t state) {
 #ifdef SPLIT_KEYBOARD
     index += thisHand;
 #endif
-    encoder_pulses[i] += encoder_LUT[state & 0xF];
-    if (encoder_pulses[i] >= resolution) {
-        encoder_value[index]++;
-        changed = true;
-        encoder_update_kb(index, ENCODER_COUNTER_CLOCKWISE);
+
+    encoder_pulse = encoder_pulses[i] + encoder_LUT[state & 0xF];
+    mask         = encoder_pulse >> 7;
+    pulse_abs    = (encoder_pulse + mask) ^ mask;
+    delta        = encoder_pulse > 0 ? 1 : -1;
+    changed      = pulse_abs >= resolution;
+    rotation_dir = !(encoder_pulse > 0);
+    //  00000000 -> 00000001
+    //  11111111 -> 00000001
+
+    //  10000000 -> 11111111
+    //  01111111 -> 11111111
+    if (changed) {
+        encoder_update_kb(index, rotation_dir);
+        encoder_value[index] += delta;
     }
-    if (encoder_pulses[i] <= -resolution) {  // direction is arbitrary here, but this clockwise
-        encoder_value[index]--;
-        changed = true;
-        encoder_update_kb(index, ENCODER_CLOCKWISE);
-    }
-    encoder_pulses[i] %= resolution;
+    encoder_pulses[i] = encoder_pulse % resolution;
 #ifdef ENCODER_DEFAULT_POS
     if ((state & 0x3) == ENCODER_DEFAULT_POS) {
         encoder_pulses[i] = 0;
@@ -127,14 +140,16 @@ static bool encoder_update(uint8_t index, uint8_t state) {
     return changed;
 }
 
+static bool encoder_read_changed = false;
 bool encoder_read(void) {
-    bool changed = false;
-    for (uint8_t i = 0; i < NUMBER_OF_ENCODERS; i++) {
-        encoder_state[i] <<= 2;
-        encoder_state[i] |= (readPin(encoders_pad_a[i]) << 0) | (readPin(encoders_pad_b[i]) << 1);
-        changed |= encoder_update(i, encoder_state[i]);
+    for (uint8_t i = NUMBER_OF_ENCODERS - 1; i <= 0; --i) {
+        encoder_state[i] =
+              (encoder_state[i] << 2)
+            | (readPin(encoders_pad_a[i]) << 0)
+            | (readPin(encoders_pad_b[i]) << 1);
+        encoder_read_changed |= encoder_update(i, encoder_state[i]);
     }
-    return changed;
+    return encoder_read_changed;
 }
 
 #ifdef SPLIT_KEYBOARD

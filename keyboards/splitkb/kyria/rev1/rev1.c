@@ -15,6 +15,7 @@
  */
 #include "rev1.h"
 
+/*
 #ifdef SWAP_HANDS_ENABLE
 // clang-format off
 __attribute__ ((weak)) const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
@@ -29,6 +30,7 @@ __attribute__ ((weak)) const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATR
 };
 // clang-format on
 #endif
+*/
 
 #ifdef RGB_MATRIX_ENABLE
 /* Map physical under glow LEDs for RGB matrix support */
@@ -55,6 +57,7 @@ led_config_t g_led_config = { {
 } };
 #endif
 
+/*
 #ifdef OLED_ENABLE
 __attribute__((weak)) oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_180; }
 
@@ -121,6 +124,7 @@ __attribute__((weak)) void oled_task_user(void) {
     }
 }
 #endif
+*/
 
 #ifdef ENCODER_ENABLE
 bool encoder_update_kb(uint8_t index, bool clockwise) {

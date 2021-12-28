@@ -115,37 +115,42 @@ __attribute__((weak)) void matrix_init_pins(void) {
 #define B0_PORT B0 >> 4
 #define F0_PORT F0 >> 4
 
+static port_data_t port_state_B = 0;
+static port_data_t port_state_F = 0;
+
 __attribute__((weak)) void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row) {
     // Start with a clear matrix row
-    matrix_row_t current_row_value = 0;
+    /* matrix_row_t current_row_value = 0; */
 
     if (!select_row(current_row)) {  // Select row
         return;                      // skip NO_PIN row
     }
 
-    matrix_output_select_delay();
+    /* matrix_output_select_delay(); */
+    waitInputPinDelay();
     //_PIN_ADDRESS(p, offset) _SFR_IO8(ADDRESS_BASE + ((p) >> PORT_SHIFTER) + (offset))
     // ADDRESS_BASE: 0
     // PORT_SHIFTER: 4
     // OFFSET      : 0
-    port_data_t port_state_B = _SFR_IO8(B0_PORT);
-    port_data_t port_state_F = _SFR_IO8(F0_PORT);
+    port_state_F = _SFR_IO8(F0_PORT);
+    port_state_B = _SFR_IO8(B0_PORT);
 
     // Unselect row
     unselect_row(current_row);
-    current_row_value = (port_state_B & 0b01000000 ? 0 : 0b00000001)
-                      | (port_state_B & 0b00000100 ? 0 : 0b00000010)
-                      | (port_state_B & 0b00001000 ? 0 : 0b00000100)
-                      | (port_state_B & 0b00000010 ? 0 : 0b00001000)
-                      | (port_state_F & 0b10000000 ? 0 : 0b00010000)
-                      | (port_state_F & 0b01000000 ? 0 : 0b00100000)
-                      | (port_state_F & 0b00100000 ? 0 : 0b01000000)
-                      | (port_state_F & 0b00010000 ? 0 : 0b10000000);
+    wait_us(10);
+    current_matrix[current_row] = (port_state_B & 0b01000000 ? 0 : 0b00000001)
+                                | (port_state_B & 0b00000100 ? 0 : 0b00000010)
+                                | (port_state_B & 0b00001000 ? 0 : 0b00000100)
+                                | (port_state_B & 0b00000010 ? 0 : 0b00001000)
+                                | (port_state_F & 0b10000000 ? 0 : 0b00010000)
+                                | (port_state_F & 0b01000000 ? 0 : 0b00100000)
+                                | (port_state_F & 0b00100000 ? 0 : 0b01000000)
+                                | (port_state_F & 0b00010000 ? 0 : 0b10000000);
 
-    matrix_output_unselect_delay(current_row, current_row_value != 0);  // wait for all Col signals to go HIGH
+    /* matrix_output_unselect_delay(current_row, current_row_value != 0);  // wait for all Col signals to go HIGH */
 
     // Update the matrix
-    current_matrix[current_row] = current_row_value;
+    /* current_matrix[current_row] = current_row_value; */
 }
 
 void matrix_init(void) {
@@ -174,19 +179,19 @@ static matrix_row_t slave_matrix[ROWS_PER_HAND] = {0};
 int32_t *slave_matrix_p = (int32_t *)slave_matrix;
 
 bool matrix_post_scan(void) {
-    bool changed = false;
+    /* bool changed = false; */
     if (is_keyboard_master()) {
         transport_master(matrix + thisHand, slave_matrix);
         matrix_scan_quantum();
-        changed = *matrix_slave_p == *slave_matrix_p;
         *matrix_slave_p = *slave_matrix_p;
+        return *matrix_slave_p == *slave_matrix_p;
     }
     else {
         transport_slave(matrix + thatHand, matrix + thisHand);
-
-        matrix_slave_scan_kb();
+        /* matrix_slave_scan_kb(); */
+        return false;
     }
-    return changed;
+    /* return changed; */
 }
 
 static matrix_row_t curr_matrix[MATRIX_ROWS] = {0};
@@ -195,7 +200,7 @@ int64_t *curr_matrix_p = (int64_t *)curr_matrix;
 uint8_t matrix_scan(void) {
 
     // Set row, read cols
-    for (uint8_t current_row = 0; current_row < ROWS_PER_HAND; current_row++) {
+    for (int8_t current_row = ROWS_PER_HAND; current_row > -1; --current_row) {
         matrix_read_cols_on_row(curr_matrix, current_row);
     }
 
@@ -203,9 +208,11 @@ uint8_t matrix_scan(void) {
     *raw_matrix_p = *curr_matrix_p;
 
     debounce(raw_matrix, matrix + thisHand, ROWS_PER_HAND, changed);
+
     changed = (changed || matrix_post_scan());
     return (uint8_t)changed;
 }
+
 
 matrix_row_t matrix_get_row(uint8_t row) {
     // debounced values
