@@ -11,10 +11,11 @@ DEBOUNCE_TYPE = sym_eager_pr
 ENCODER_ENABLE = yes
 
 CUSTOM_MATRIX = yes
-COMBO_ENABLE = yes
+COMBO_ENABLE = no
 
 SRC += swapper.c
 SRC += matrix.c
+SRC += caps_word.c
 
 CONSOLE_ENABLE = no
 

@@ -1,7 +1,9 @@
 #include "swapper.h"
 
-void update_swapper(
-    bool *active,
+
+static bool swapper_active = false;
+
+bool update_swapper(
     uint16_t cmdish,
     uint16_t tabish,
     uint16_t trigger_next,
@@ -10,36 +12,43 @@ void update_swapper(
     uint16_t keycode,
     keyrecord_t *record
 ) {
+
     if (keycode == trigger_next) {
         if (record->event.pressed) {
-            if (!*active) {
-                *active = true;
-                register_code(cmdish);
+            if (!swapper_active) {
+                swapper_active = true;
+                register_mods(MOD_BIT(cmdish));
             }
-            register_code(tabish);
+            register_code16(tabish);
         } else {
-            unregister_code(tabish);
+            unregister_code16(tabish);
             // Don't unregister cmdish until some other key is hit or released.
         }
     } else if (keycode == trigger_prev) {
         if (record->event.pressed) {
-            if (!*active) {
-                *active = true;
-                register_code(cmdish);
+            if (!swapper_active) {
+                swapper_active = true;
+                register_mods(MOD_BIT(cmdish));
             }
-            register_code(KC_LSFT);
-            register_code(tabish);
+            register_mods(MOD_BIT(KC_LSFT));
+            register_code16(tabish);
         } else {
-            unregister_code(tabish);
-            unregister_code(KC_LSFT);
+            unregister_mods(MOD_BIT(KC_LSFT));
+            unregister_code16(tabish);
             // Don't unregister cmdish until some other key is hit or released.
         }
-    } else if (keycode == trigger_actv) {
-        tap_code(KC_LALT);
-        unregister_code(cmdish);
-        *active = false;
-    } else if (*active) {
-        unregister_code(cmdish);
-        *active = false;
+    } else if (swapper_active && keycode == trigger_actv) {
+        if (record->event.pressed) {
+            unregister_mods(MOD_BIT(cmdish));
+            swapper_active = false;
+        }
+    } else if (swapper_active) {
+        unregister_mods(MOD_BIT(cmdish));
+        swapper_active = false;
+        return true;
     }
+    else {
+        return true;
+    }
+    return false;
 }
