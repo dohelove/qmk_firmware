@@ -20,6 +20,10 @@
 #include "common.h"
 /* #include "print.h" */
 
+#ifdef BONGO_ENABLE
+#include "bongo.h"
+#endif
+
 
 enum custom_keycodes {
     KC_CCCV = SAFE_RANGE,
@@ -240,50 +244,53 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_
 
 void oled_task_user(void) {
     if (is_keyboard_master()) {
+        draw_bongo();
         // QMK Logo and version information
-        // clang-format off
-        static const char PROGMEM qmk_logo[] = {
-            0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
-            0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
-            0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0};
+        /* static const char PROGMEM qmk_logo[] = { */
+        /*     0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94, */
+        /*     0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4, */
+        /*     0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0}; */
         // clang-format on
+        /* oled_write_P(qmk_logo, false); */
+        /* oled_write_P(PSTR("Kyria rev1.0\n\n"), false); */
 
-        oled_write_P(qmk_logo, false);
-        oled_write_P(PSTR("Kyria rev1.0\n\n"), false);
 
-        /* // Host Keyboard Layer Status */
-        oled_write_P(PSTR("Layer: "), false);
+        oled_set_cursor(0, 5);
+        oled_write("Layer: ", false);
         switch (get_highest_layer(layer_state|default_layer_state)) {
             case _QWERTY:
-                oled_write_P(PSTR("QWERTY\n"), false);
+                oled_write("QWERTY", false);
                 break;
             case _NUMBER:
-                oled_write_P(PSTR("Num\n"), false);
+                oled_write("Num   ", false);
                 break;
             case _NAV:
-                oled_write_P(PSTR("Nav\n"), false);
+                oled_write("Nav   ", false);
                 break;
             case _SYM:
-                oled_write_P(PSTR("Sym\n"), false);
+                oled_write("Sym   ", false);
                 break;
             case _FUNCTION:
-                oled_write_P(PSTR("Func\n"), false);
+                oled_write("Func  ", false);
                 break;
             case _ADJUST:
-                oled_write_P(PSTR("Adj\n"), false);
+                oled_write("Set   ", false);
                 break;
             default:
-                oled_write_P(PSTR("Undefined\n"), false);
+                oled_write("Error ", false);
         }
 
-    } else {
-        /* // Write host Keyboard LED Status to OLEDs */
-
-        oled_write_P(PSTR("DoHee's Keeb!\n"), false);
         led_t led_usb_state = host_keyboard_led_state();
-        oled_write_P(led_usb_state.caps_lock   ? PSTR("CAPLCK ") : PSTR("       "), false);
-        oled_write_P(led_usb_state.scroll_lock ? PSTR("SCRLCK ") : PSTR("       "), false);
-        oled_write_P(led_usb_state.num_lock    ? PSTR("NUMLCK ") : PSTR("       "), false);
+        oled_set_cursor(0, 6);
+        oled_write(led_usb_state.caps_lock ? "CAPLCK " : "       ", false);
+
+    } else {
+        oled_set_cursor(0, 2);
+        oled_write("DoHee's Keeb!", false);
+        /* led_t led_usb_state = host_keyboard_led_state(); */
+        /* oled_write_P(led_usb_state.caps_lock   ? PSTR("CAPLCK ") : PSTR("       "), false); */
+        /* oled_write_P(led_usb_state.scroll_lock ? PSTR("SCRLCK ") : PSTR("       "), false); */
+        /* oled_write_P(led_usb_state.num_lock    ? PSTR("NUMLCK ") : PSTR("       "), false); */
     }
 }
 #endif
