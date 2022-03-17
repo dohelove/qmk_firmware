@@ -41,6 +41,7 @@ enum custom_keycodes {
 
 #define CTL_ESC  MT(MOD_LCTL, KC_ESC)
 #define CTL_QUT  MT(MOD_RCTL, KC_QUOTE)
+#define SFT_QUT  MT(MOD_RSFT, KC_QUOTE)
 #define ALT_ENT  MT(MOD_LALT, KC_ENTER)
 #define ALT_SPC  MT(MOD_LALT, KC_SPC)
 
@@ -58,9 +59,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,------------------------------------------.                              ,------------------------------------------.
  * |  Tab  |   Q  |   W  |   E  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  | Bspc  |
  * |-------+------+------+------+------+------|                              |------+------+------+------+------+-------|
- * |Esc/Ctl|   A  |   S  |   D  |   F  |   G  |                              |   H  |   J  |   K  |   L  |   ;  | '/Ctl |
+ * | Shift |   A  |   S  |   D  |   F  |   G  |                              |   H  |   J  |   K  |   L  |   ;  | '/Sft |
  * |-------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+-------|
- * | Shift |   Z  |   X  |   C  |   V  |   B  |      | CcCv |  | Enter|      |   N  |   M  |   ,  |   .  |   /  | Shift |
+ * |Esc/Ctl|   Z  |   X  |   C  |   V  |   B  |      | CcCv |  | Enter|      |   N  |   M  |   ,  |   .  |   /  |  Ctrl |
  * `---------------------+------+------+------+ Enter+------|  |------+ Space+------+------+------+---------------------'
  *                       |Adjust| Menu | FKeys| /Alt | Sym  |  |  Num | /Alt |  Nav | Lang |Adjust|
  *                       |      |      |      |      |      |  |      |      |      |      |      |
@@ -68,8 +69,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [_QWERTY] = LAYOUT(
      KC_TAB , KC_Q   , KC_W   , KC_E   , KC_R   , KC_T   ,                                     KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   , KC_BSPC,
-     CTL_ESC, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   ,                                     KC_H   , KC_J   , KC_K   , KC_L   , KC_SCLN, CTL_QUT,
-     KC_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , XXXXXXX, KC_CCCV, KC_ENT , XXXXXXX, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_RSFT,
+     KC_LSFT, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   ,                                     KC_H   , KC_J   , KC_K   , KC_L   , KC_SCLN, SFT_QUT,
+     CTL_ESC, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   , XXXXXXX, KC_CCCV, KC_ENT , XXXXXXX, KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, KC_RCTL,
                                 ADJUST , KC_APP , FKEYS  , ALT_ENT, SYM    , NUM    , ALT_SPC, NAV    , KC_HAEN, ADJUST
     ),
 
@@ -77,20 +78,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Sym Layer
  *
  * ,-----------------------------------------.                              ,-----------------------------------------.
- * |      |   `  |   $  |   #  |   &  |   ^  |                              |      |      |      |      |      |      |
+ * |      |   @  |   \  |   =  |   %  |   /  |                              |      |   #  |   =  |   _  |      |      |
  * |------+------+------+------+------+------|                              |------+------+------+------+------+------|
- * | Base |   !  |   =  |   +  |   -  |   |  |                              |      | Shift| Ctrl |  Gui |  Alt |      |
+ * | Base |   &  |   $  |   -  |   +  |   *  |                              |      |   {  |   (  |   )  |   }  |      |
  * |------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+------|
- * |      |   @  |   %  |   *  |   ~  |   \  |      |      |  | Enter|      |      |      |      |      |      |      |
+ * |      |   `  |   ~  |   !  |   ^  |   |  |      |      |  | Enter|      |      |   [  |   <  |   >  |   ]  |      |
  * `--------------------+------+------+------+------+------|  |------+------+------+------+------+--------------------'
  *                      |      |      |      |      |      |  |      |      |      |      |      |
  *                      |      |      |      |      |      |  |      |      |      |      |      |
  *                      `----------------------------------'  `----------------------------------'
  */
     [_SYM] = LAYOUT(
-      _______, KC_AT  , KC_DLR , KC_HASH, KC_CIRC, KC_BSLS,                                    _______, _______, _______, _______, _______, _______,
-      BASE   , KC_PIPE, KC_EQL , KC_PERC, KC_CIRC, KC_EXLM,                                    _______, KC_LSFT, KC_LCTL, KC_LGUI, KC_LALT, _______,
-      _______, KC_GRV , KC_PERC, KC_ASTR, KC_TILD, KC_AMPR,_______, _______, KC_ENT , _______, _______, _______, _______, _______, _______, _______,
+      _______, KC_AT  , KC_BSLS, KC_EQL , KC_PERC, KC_SLSH,                                    _______, KC_HASH, KC_EQL , KC_UNDS, _______, _______,
+      BASE   , KC_AMPR, KC_DLR , KC_MINS, KC_PLUS, KC_ASTR,                                    _______, KC_LCBR, KC_LPRN, KC_RPRN, KC_RCBR, _______,
+      _______, KC_GRV , KC_TILD, KC_EXLM, KC_CIRC, KC_PIPE,_______, _______, KC_ENT , _______, _______, KC_LBRC, KC_LABK, KC_RABK, KC_RBRC, _______,
                                  _______, _______, _______,_______, _______, _______, _______, _______, _______, _______
     ),
 
